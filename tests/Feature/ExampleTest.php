@@ -1,7 +1,11 @@
 <?php
 
-test('the application returns a successful response', function () {
-    $response = $this->get('/');
+use function Pest\Laravel\get;
 
-    $response->assertStatus(200);
+it('renders the landing page', function () {
+    get('/')
+        ->assertOk()
+        ->assertSee('Hold the little moments in living color.', false)
+        ->assertSee('Request an invite', false)
+        ->assertSee('Inviting someone is easy', false);
 });
