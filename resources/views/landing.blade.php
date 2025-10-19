@@ -136,7 +136,7 @@
         </main>
 
         <footer class="relative mx-auto max-w-6xl px-6 pb-16 pt-12 text-sm text-slate-400/80 lg:px-10">
-            <p>&copy; {{ date('Y') }} Memzies. Built with care in Colorado.</p>
+            <p>&copy; {{ date('Y') }} Memzies.</p>
         </footer>
     </div>
 @endsection
