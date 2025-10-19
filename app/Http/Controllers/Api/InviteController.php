@@ -27,7 +27,7 @@ class InviteController extends Controller
             'journal_name' => $validated['journal_name'] ?? null,
             'recipient_name' => $validated['recipient_name'] ?? null,
             'sender_name' => $validated['sender_name'] ?? null,
-            'metadata' => $validated['metadata'] ?? null,
+            'metadata' => $validated['metadata'] ?? [],
         ]);
 
         return response()->json([
@@ -77,7 +77,18 @@ class InviteController extends Controller
             'accepted_by' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $invite->markAccepted($validated['accepted_by'] ?? null);
+        $acceptedBy = $validated['accepted_by'] ?? null;
+
+        if ($this->acceptanceShouldBeBlocked($invite, $acceptedBy)) {
+            return response()->json([
+                'error' => [
+                    'code' => 'already_member',
+                    'message' => 'You are already a member of this journal.',
+                ],
+            ], 409);
+        }
+
+        $invite->markAccepted($acceptedBy);
 
         return response()->json([
             'data' => $this->formatInvite($invite),
@@ -106,5 +117,26 @@ class InviteController extends Controller
         } while (Invite::where('token', $token)->exists());
 
         return $token;
+    }
+
+    private function acceptanceShouldBeBlocked(Invite $invite, ?string $acceptedBy): bool
+    {
+        if ($acceptedBy === null) {
+            return false;
+        }
+
+        $metadata = $invite->metadata ?? [];
+
+        if (!is_array($metadata)) {
+            return false;
+        }
+
+        $disallowed = $metadata['disallowed_icloud_ids'] ?? [];
+
+        if (!is_array($disallowed)) {
+            return false;
+        }
+
+        return in_array($acceptedBy, $disallowed, true);
     }
 }
