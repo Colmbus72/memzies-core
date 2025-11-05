@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "99FHQY5UZE.desertsilo.Memzies",
+        "paths": [
+          "/invite/*"
+        ]
+      }
+    ]
+  }
+}

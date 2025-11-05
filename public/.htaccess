@@ -5,6 +5,11 @@
 
     RewriteEngine On
 
+    # Serve Apple App Site Association file with correct Content-Type
+    <Files "apple-app-site-association">
+        Header set Content-Type "application/json"
+    </Files>
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

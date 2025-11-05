@@ -24,10 +24,11 @@ class InvitePageController extends Controller
 
     private function buildDeepLink(string $token, ?string $journalId = null): string
     {
-        $base = "memzies://invite?token={$token}";
+        // Use Universal Links instead of custom URL scheme
+        $base = url("/invite/{$token}");
 
         if ($journalId !== null) {
-            $base .= '&journal=' . urlencode($journalId);
+            $base .= '?journal=' . urlencode($journalId);
         }
 
         return $base;
