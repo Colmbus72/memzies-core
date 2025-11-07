@@ -52,6 +52,33 @@ class InviteController extends Controller
         ]);
     }
 
+    public function indexForUser(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'icloud_id' => ['required', 'string', 'max:255'],
+        ]);
+
+        $icloudId = $validated['icloud_id'];
+
+        // Find all pending invites where the invitee_icloud_user_record_name matches
+        $invites = Invite::where('status', Invite::STATUS_PENDING)
+            ->get()
+            ->filter(function ($invite) use ($icloudId) {
+                $metadata = $invite->metadata ?? [];
+                if (!is_array($metadata)) {
+                    return false;
+                }
+
+                $inviteeIcloudId = $metadata['invitee_icloud_user_record_name'] ?? null;
+                return $inviteeIcloudId === $icloudId;
+            })
+            ->values();
+
+        return response()->json([
+            'data' => $invites->map(fn($invite) => $this->formatInvite($invite)),
+        ]);
+    }
+
     public function accept(Request $request, string $token): JsonResponse
     {
         $invite = Invite::where('token', $token)->first();
