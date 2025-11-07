@@ -115,15 +115,42 @@ class InviteController extends Controller
             ], 409);
         }
 
+        \Log::info('🟢 [ACCEPT DEBUG] Before markAccepted:', [
+            'token' => $invite->token,
+            'metadata' => $invite->metadata,
+            'metadata_type' => gettype($invite->metadata),
+        ]);
+
         $invite->markAccepted($acceptedBy);
 
+        \Log::info('🟢 [ACCEPT DEBUG] After markAccepted:', [
+            'token' => $invite->token,
+            'metadata' => $invite->metadata,
+            'metadata_type' => gettype($invite->metadata),
+        ]);
+
+        $formatted = $this->formatInvite($invite);
+        \Log::info('🔵 [INVITE ACCEPT DEBUG] Formatted invite response:', [
+            'formatted' => $formatted,
+            'metadata' => $formatted['metadata'] ?? 'NO METADATA KEY',
+            'metadata_type' => gettype($formatted['metadata'] ?? null),
+        ]);
+
         return response()->json([
-            'data' => $this->formatInvite($invite),
+            'data' => $formatted,
         ]);
     }
 
     private function formatInvite(Invite $invite): array
     {
+        \Log::info('🟡 [FORMAT DEBUG] formatInvite called:', [
+            'token' => $invite->token,
+            'metadata_raw' => $invite->getAttributes()['metadata'] ?? 'NOT SET',
+            'metadata_casted' => $invite->metadata,
+            'metadata_type' => gettype($invite->metadata),
+            'metadata_is_array' => is_array($invite->metadata),
+        ]);
+
         return [
             'token' => $invite->token,
             'status' => $invite->status,
